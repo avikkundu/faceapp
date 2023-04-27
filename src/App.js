@@ -32,22 +32,34 @@ function App() {
   
   const [emotion,setEmotion]=useState("");
   const [load,isLoadding]=useState(false);
+  const [spin,setSpin]=useState(false);
 
   const handleClick = ()=>{
+
+    
     uploadImage(picture);
+    setName(document.getElementById("name").value);
+    setPhone(document.getElementById("phone").value);
+    document.getElementById("file").value="";
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+    setPicture(null);
     
   }
   const  onChangePicture = e => {
     if (e.target.files[0]) {
-      //console.log("picture: ", e.target.files);
       setPicture(e.target.files[0]);
       
-  
     }
     
   };
 async function uploadImage(e) {
+  setSpin(true);
   const imgFile = e
+  if(imgFile==null)
+  { setSpin(false);
+    return;
+  }
   const img = await faceapi.bufferToImage(imgFile)
   const detections = await faceapi.detectSingleFace(img).withFaceExpressions();
   const expressions = detections.expressions;
@@ -57,11 +69,12 @@ async function uploadImage(e) {
         );
   console.log(emotion);
   setEmotion(emotion);
+  setSpin(false);
   isLoadding(true);
 }
   return (
     <div className="App">
-    <h1 style={{color:'white'}}>Face App</h1>
+    <h1 style={{color:'white'}}>🅵🅰🅲🅴 🅰🅿🅿</h1>
     <h2 style={{
                  position:'absolute',
                  top:'100px',
@@ -69,32 +82,51 @@ async function uploadImage(e) {
                  color:'white'}}
     >Enter Details::</h2>
     <TextField
-                value={name}
+                id="name"
                 label="Enter your name"
                 variant="filled" 
-                onChange={(e) => {
-                    setName(e.target.value);
-                }}
                 sx={{position:'absolute',top:'180px',left:'100px'}}
             />
             <TextField
-                value={phone}
+                id="phone"
                 label="Enter your phone number"
                 variant="filled" 
-                onChange={(e) => {
-                    setPhone(e.target.value);
-                }}
                 sx={{position:'absolute',top:'180px',left:'400px'}}
             />
            <img id="logo" src={faceDetection} /> 
-          <input type="file" style={{position:'absolute',top:'280px',left:'100px',color:'white'}} onChange={onChangePicture} />
-          <Button variant="contained" color="success" sx={{position:'absolute',top:'330px',left:'270px'}} onClick={handleClick}>Submit</Button>
-          
+          <input 
+                  id="file" 
+                  type="file"
+                  style= {{
+                            position:'absolute',
+                            top:'280px',
+                            left:'100px',
+                            color:'white'
+                          }}
+                   onChange={onChangePicture} />
+
+          <Button 
+                  variant="contained"
+                  color="success"
+                  sx= {{
+                          position:'absolute',
+                          top:'330px',
+                          left:'290px'
+                      }}
+                   onClick={handleClick} >Submit</Button>
+          {spin?
+                <div>
+                       <img src={spinner}/>
+                </div>
+                 :''
+
+          }
           {load?
             <div>
-                 <h2 style={{position:'absolute',top:'400px',left:'100px',color:'white'}}>Result::</h2>
-                 <h3 style={{position:'absolute',top:'440px',left:'100px',color:'white'}}>Name: {name}  Phone Number: {phone}</h3>
-                 <h3 style={{position:'absolute',top:'490px',left:'100px',color:'white'}}>Mood:{emotion}</h3>
+                 <h2 style={{position:'absolute',top:'400px',left:'100px',color:'white'}}>Result  ::</h2>
+                 <h3 style={{position:'absolute',top:'440px',left:'100px',color:'white'}}>Name: {name}  </h3>
+                 <h3 style={{position:'absolute',top:'480px',left:'100px',color:'white'}}>Phone Number: {phone}</h3>
+                 <h3 style={{position:'absolute',top:'520px',left:'100px',color:'white'}}>Mood: {emotion}</h3>
             </div>
           :''} 
     </div>
