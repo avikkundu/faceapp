@@ -5,7 +5,8 @@ import 'https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js';
 import { TextField,Button } from "@mui/material";
 import './App.css';
 import React, { useState } from 'react';
-
+import faceDetection from "./images/FaceDetection.gif";
+import spinner from "./images/loader.gif";
 
 async function face(){
 
@@ -27,21 +28,26 @@ face();
 function App() {
   const [picture, setPicture] = useState(null);
   const [name,setName]=useState("");
-  const [phone,setPhone]=useState();
-  const [mood,setMood]=useState("");
+  const [phone,setPhone]=useState("");
+  
   const [emotion,setEmotion]=useState("");
+  const [load,isLoadding]=useState(false);
 
+  const handleClick = ()=>{
+    uploadImage(picture);
+    
+  }
   const  onChangePicture = e => {
     if (e.target.files[0]) {
-      console.log("picture: ", e.target.files);
+      //console.log("picture: ", e.target.files);
       setPicture(e.target.files[0]);
-      uploadImage(e);
+      
   
     }
     
   };
 async function uploadImage(e) {
-  const imgFile = e.target.files[0]
+  const imgFile = e
   const img = await faceapi.bufferToImage(imgFile)
   const detections = await faceapi.detectSingleFace(img).withFaceExpressions();
   const expressions = detections.expressions;
@@ -51,10 +57,17 @@ async function uploadImage(e) {
         );
   console.log(emotion);
   setEmotion(emotion);
+  isLoadding(true);
 }
   return (
     <div className="App">
     <h1 style={{color:'white'}}>Face App</h1>
+    <h2 style={{
+                 position:'absolute',
+                 top:'100px',
+                 left:'100px',
+                 color:'white'}}
+    >Enter Details::</h2>
     <TextField
                 value={name}
                 label="Enter your name"
@@ -62,7 +75,7 @@ async function uploadImage(e) {
                 onChange={(e) => {
                     setName(e.target.value);
                 }}
-                sx={{position:'absolute',top:'220px',left:'100px'}}
+                sx={{position:'absolute',top:'180px',left:'100px'}}
             />
             <TextField
                 value={phone}
@@ -71,11 +84,19 @@ async function uploadImage(e) {
                 onChange={(e) => {
                     setPhone(e.target.value);
                 }}
-                sx={{position:'absolute',top:'220px',left:'400px'}}
+                sx={{position:'absolute',top:'180px',left:'400px'}}
             />
-          <input type="file" style={{position:'absolute',top:'300px',left:'100px'}} onChange={onChangePicture} />
-          <Button variant="contained" color="success" sx={{position:'absolute',top:'350px',left:'250px'}} onClick={()=>{setMood(emotion)}}>Submit</Button>
-          <h3 style={{position:'absolute',top:'400px',left:'100px',color:'white'}}>Mood:{mood}</h3>
+           <img id="logo" src={faceDetection} /> 
+          <input type="file" style={{position:'absolute',top:'280px',left:'100px',color:'white'}} onChange={onChangePicture} />
+          <Button variant="contained" color="success" sx={{position:'absolute',top:'330px',left:'270px'}} onClick={handleClick}>Submit</Button>
+          
+          {load?
+            <div>
+                 <h2 style={{position:'absolute',top:'400px',left:'100px',color:'white'}}>Result::</h2>
+                 <h3 style={{position:'absolute',top:'440px',left:'100px',color:'white'}}>Name: {name}  Phone Number: {phone}</h3>
+                 <h3 style={{position:'absolute',top:'490px',left:'100px',color:'white'}}>Mood:{emotion}</h3>
+            </div>
+          :''} 
     </div>
   );
 }
